@@ -12,6 +12,15 @@ export type User = {
     dailyCalorieIntake?: number;
     dailyCalorieBurn?: number;
     createdAt?: string;
+    profilePhoto?: {                         
+        id: number;
+        url: string;
+        formats?: {
+            thumbnail?: { url: string };
+            small?: { url: string };
+            medium?: { url: string };
+        };
+    } | null;
 } | null;
 
 // Credentials
