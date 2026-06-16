@@ -25,7 +25,7 @@ const {theme, toogleTheme} = useTheme()
             ))} 
 
             <button onClick={toogleTheme}
-                className="fixed bottom-2.5 right-4 p-3 rounded-full bg-emerald-600 text-white shadow-lg hover:scale-105 transitional">
+                className="flex bottom-2.5 right-4 p-3 rounded-full bg-emerald-600 text-white shadow-lg hover:scale-105 transitional">
                 {theme === 'light'? <MoonIcon className="size-5.5"/> : <SunIcon className="size-5.5"/>}
                 
             </button>
