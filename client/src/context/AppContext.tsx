@@ -56,7 +56,7 @@ export const AppProvider = ({children} : {children: React.ReactNode}) => {
     const fetchUser = async (token: string) =>
     {
        try {
-             const{data} = await api.get('/api/users/me?populate=profilePhoto', {headers: {Authorization: `Bearer ${token}`}})
+             const{data} = await api.get('/api/users/me', {headers: {Authorization: `Bearer ${token}`}})
         setUser({...data, token})
         if(data?.age && data?.weight && data?.goal)
         {

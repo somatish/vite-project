@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import type { ProfileFormData } from "../types";
 import Card from "../components/ui/Card";
-import { Calendar, Camera, Eye, LogOutIcon, Scale, Target, User, X } from "lucide-react";
+import { Calendar, LogOutIcon, Scale, Target, User } from "lucide-react";
 import Button from "../components/ui/Button";
 import { goalLabels, goalOptions } from "../assets/assets";
 import Input from "../components/ui/Input";
@@ -23,50 +23,6 @@ const Profile = () => {
     dailyCalorieBurn: 400,
   });
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  
-  // FIX 1: Changed state types from 'null' to 'undefined' for full tsc compliance
-  const [photoPreview, setPhotoPreview] = useState<string | undefined>(undefined);
-  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
-  const [showPhotoModal, setShowPhotoModal] = useState(false);
-
-  // FIX 2: Replaced the 'null' fallback with 'undefined'
-  const profilePhotoUrl = user?.profilePhoto?.url
-    ? user.profilePhoto.url.startsWith("http")
-      ? user.profilePhoto.url
-      : `${import.meta.env.VITE_STRAPI_API_URL}${user.profilePhoto.url}`
-    : undefined;
-
-  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setShowPhotoModal(false);
-
-    const reader = new FileReader();
-    reader.onload = (ev) => setPhotoPreview(ev.target?.result as string);
-    reader.readAsDataURL(file);
-
-    setIsUploadingPhoto(true);
-    try {
-      const uploadForm = new FormData();
-      uploadForm.append("files", file);
-      const { data: uploaded } = await api.post("/api/upload", uploadForm, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      await api.put(`/api/users/${user?.id}`, { profilePhoto: uploaded[0]?.id });
-      await fetchUser(user?.token || "");
-      setPhotoPreview(undefined);
-      toast.success("Profile photo updated!");
-    } catch (err: any) {
-      console.log(err);
-      toast.error(err?.message || "Failed to update photo");
-      setPhotoPreview(undefined);
-    } finally {
-      setIsUploadingPhoto(false);
-    }
-  };
-
   const fetchUserData = () => {
     if (user) {
       setFormData({
@@ -81,7 +37,9 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    fetchUserData();
+    (() => {
+      fetchUserData();
+    })();
   }, [user]);
 
   const handleSave = async () => {
@@ -99,6 +57,7 @@ const Profile = () => {
   const getStats = () => {
     const totalFooEntries = allFoodLogs.length || 0;
     const totalActivities = allActivityLogs.length || 0;
+
     return { totalFooEntries, totalActivities };
   };
 
@@ -115,52 +74,18 @@ const Profile = () => {
       </div>
 
       <div className="profile-content">
-        {/* Left Column */}
+        {/* Left-Column */}
         <Card>
           {/* Card Title */}
           <div className="flex items-center gap-4 mb-6">
-            {/* Avatar */}
-            <div
-              className="relative group cursor-pointer flex-shrink-0"
-              onClick={() => (isEditing ? fileInputRef.current?.click() : setShowPhotoModal(true))}
-            >
-              <div className="size-16 rounded-full overflow-hidden bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center ring-2 ring-emerald-500/30">
-                {photoPreview || profilePhotoUrl ? (
-                  <img src={photoPreview || profilePhotoUrl} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  <User className="size-8 text-white" />
-                )}
-              </div>
-
-              {isUploadingPhoto ? (
-                <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
-                  <div className="size-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                </div>
-              ) : (
-                <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  {isEditing ? <Camera className="size-5 text-white" /> : <Eye className="size-5 text-white" />}
-                </div>
-              )}
-
-              {/* FIX 3: Removed the broken stray 'setIsEditing(false)' statement from here */}
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handlePhotoChange}
-              />
+            <div className="size-12 rounded-xl bg-linear-to-br from-emerald-400 to-emerald-600 flex items-center justify-center">
+              <User className="size-6 text-white" />
             </div>
-
-            {/* Username */}
             <div>
-              <h2 className="text-lg font-semibold text-slate-800 dark:text-white">{user?.username}</h2>
+              {/* CHANGED: Swapped out "Your Profile" with the dynamic username */}
+              <h2 className="text-lg font-semibold text-slate-800 dark:text-white">{user.username}</h2>
               <p className="text-slate-500 dark:text-slate-400 text-xs">
                 Member Since {new Date(user?.createdAt || "").toLocaleDateString()}
-              </p>
-              <p className="text-slate-400 dark:text-slate-500 text-xs mt-0.5">
-                {isEditing ? "Tap photo to change" : "Tap to view"}
               </p>
             </div>
           </div>
@@ -175,6 +100,7 @@ const Profile = () => {
                 min={12}
                 max={120}
               />
+
               <Input
                 label="Weight"
                 type="number"
@@ -183,6 +109,7 @@ const Profile = () => {
                 min={20}
                 max={300}
               />
+
               <Input
                 label="Height"
                 type="number"
@@ -191,6 +118,7 @@ const Profile = () => {
                 min={100}
                 max={250}
               />
+
               <Select
                 label="Fitness Goal"
                 value={formData.goal as string}
@@ -208,8 +136,7 @@ const Profile = () => {
                       age: Number(user.age),
                       weight: Number(user.weight),
                       height: Number(user.height),
-                      // FIX 4: Replaced invalid empty string fallback with a strict typed default
-                      goal: user.goal || "maintain",
+                      goal: user.goal || "maintain", // Guarded against empty string crash
                       dailyCalorieIntake: user.dailyCalorieIntake || 2000,
                       dailyCalorieBurn: user.dailyCalorieBurn || 400,
                     });
@@ -217,6 +144,7 @@ const Profile = () => {
                 >
                   Cancel
                 </Button>
+
                 <Button onClick={handleSave} className="flex-1">
                   Save Changes
                 </Button>
@@ -225,7 +153,7 @@ const Profile = () => {
           ) : (
             <>
               <div className="space-y-4">
-                {/* Age */}
+                {/* AGE */}
                 <div className="flex items-center gap-4 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg transition-colors duration-200">
                   <div className="size-10 rounded-lg bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center">
                     <Calendar className="size-4.5 text-blue-600 dark:text-blue-400" />
@@ -278,8 +206,9 @@ const Profile = () => {
           )}
         </Card>
 
-        {/* Right Column */}
+        {/* Right-Column */}
         <div className="space-y-4">
+          {/* Status Card */}
           <Card>
             <h3 className="font-semibold text-slate-800 dark:text-white mb-4">Your Stats</h3>
             <div className="grid grid-cols-2 gap-4">
@@ -287,6 +216,7 @@ const Profile = () => {
                 <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{stats.totalFooEntries}</p>
                 <p className="text-sm text-slate-500 dark:text-slate-400">Food Entries</p>
               </div>
+
               <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/10 rounded-xl">
                 <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{stats.totalActivities}</p>
                 <p className="text-sm text-slate-500 dark:text-slate-400">Activities</p>
@@ -294,54 +224,13 @@ const Profile = () => {
             </div>
           </Card>
 
-          <Button variant="danger" onClick={logout} className="w-full ring ring-red-300 hover:ring-2">
+          {/* Logout Button */}
+          <Button variant="danger" onClick={logout} className="w-full ring ring-red-300 hover:ring-2 ">
             <LogOutIcon className="size-4" />
             Logout
           </Button>
         </div>
       </div>
-
-      {/* View Photo Modal — only shows in normal mode */}
-      {showPhotoModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
-          onClick={() => setShowPhotoModal(false)}
-        >
-          <div
-            className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-xs w-full mx-4 space-y-5"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-slate-800 dark:text-white">Profile Photo</h3>
-              <button
-                onClick={() => setShowPhotoModal(false)}
-                className="size-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-              >
-                <X className="size-4" />
-              </button>
-            </div>
-
-            <div className="size-48 rounded-full overflow-hidden bg-gradient-to-br from-emerald-400 to-emerald-600 mx-auto flex items-center justify-center ring-4 ring-emerald-500/20">
-              {profilePhotoUrl ? (
-                <img src={profilePhotoUrl} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                <User className="size-20 text-white" />
-              )}
-            </div>
-
-            <div className="text-center space-y-1">
-              <p className="font-semibold text-slate-800 dark:text-white">{user?.username}</p>
-              <p className="text-xs text-slate-400 dark:text-slate-500">
-                {profilePhotoUrl ? "Looking good!" : "No photo uploaded yet"}
-              </p>
-            </div>
-
-            <Button variant="secondary" className="w-full" onClick={() => setShowPhotoModal(false)}>
-              Close
-            </Button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
