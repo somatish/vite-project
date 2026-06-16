@@ -24,10 +24,13 @@ const Profile = () => {
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // FIX 1: Changed state types from 'null' to 'undefined' for full tsc compliance
   const [photoPreview, setPhotoPreview] = useState<string | undefined>(undefined);
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
 
+  // FIX 2: Replaced the 'null' fallback with 'undefined'
   const profilePhotoUrl = user?.profilePhoto?.url
     ? user.profilePhoto.url.startsWith("http")
       ? user.profilePhoto.url
@@ -139,6 +142,8 @@ const Profile = () => {
                 </div>
               )}
 
+              {/* FIX 3: Removed the broken stray 'setIsEditing(false)' statement from here */}
+
               <input
                 ref={fileInputRef}
                 type="file"
@@ -203,7 +208,8 @@ const Profile = () => {
                       age: Number(user.age),
                       weight: Number(user.weight),
                       height: Number(user.height),
-                      goal: user.goal || "",
+                      // FIX 4: Replaced invalid empty string fallback with a strict typed default
+                      goal: user.goal || "maintain",
                       dailyCalorieIntake: user.dailyCalorieIntake || 2000,
                       dailyCalorieBurn: user.dailyCalorieBurn || 400,
                     });
