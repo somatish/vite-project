@@ -95,13 +95,6 @@
       "relation": "oneToMany",
       "target": "api::activity-log.activity-log",
       "mappedBy": "users_permissions_user"
-    },
-    "profilePhoto": {
-      "type": "media",
-      "multiple": false,
-      "allowedTypes": [
-        "images"
-      ]
     }
   }
 }
