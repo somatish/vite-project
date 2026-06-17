@@ -92,7 +92,7 @@ const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const result = data.result;
     let mealType = '';
     const hour = new Date().getHours()
-    if(hour >= 0 && hour < 12)
+    if(hour >= 6 && hour < 12)
     {
       mealType = 'breakfast';
     }
@@ -100,7 +100,7 @@ const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     {
       mealType = 'lunch';
     }
-    else if(hour >= 17 && hour < 20)
+    else if((hour >= 17 && hour < 20) || (hour >=1 && hour <6))
     {
       mealType = 'snack';
     }
