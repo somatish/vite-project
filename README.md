@@ -61,14 +61,13 @@ Through this project, I gained practical experience with:
 * AI integration using Google Gemini API
 * Responsive UI design and modern frontend development
 
-## Future Enhancements
+## Future Upscalling
 
-* Profile Picture Upload
-* Weekly and Monthly Analytics Dashboard
-* Fitness Progress Visualization
+* Converting into a full MERN Stack project.
+* Adding a hardware device like smartwatch to track the activities and automatically update into the app.
+* Monthly Analytics Dashboard
 * Advanced AI Nutrition Recommendations
-* Cloud Database Deployment
-* Multi-device Synchronization
+
 
 ## Author
 
