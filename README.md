@@ -1,6 +1,6 @@
 # AI-Powered Fitness Tracker
 
-A full-stack fitness tracking application built using React, TypeScript, Strapi, and SQLite. The platform enables users to monitor their daily calorie intake, track physical activities, calculate BMI, manage fitness goals, and maintain a personalized fitness profile.
+A full-stack fitness tracking application built using React, TypeScript, Tailwind CSS, Strapi, and SQLite. The platform enables users to monitor their daily calorie intake, track physical activities, calculate BMI, manage fitness goals, and maintain a personalized fitness profile.
 
 ## Features
 
